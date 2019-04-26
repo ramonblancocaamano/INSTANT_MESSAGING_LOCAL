@@ -7,47 +7,58 @@ import java.util.ArrayList;
 import java.util.List;
 import subscriber.Subscriber;
 
+/**
+ * @Author: BLANCO CAAMANO, Ramon <ramonblancocaamano@gmail.com>
+ */
 public class PublisherImpl implements Publisher {
 
-  private List<Subscriber> subscriberSet;
-  private int numPublishers;
-  private Topic topic;
+    private List<Subscriber> subscriberSet;
+    private int numPublishers;
+    private Topic topic;
 
-  public PublisherImpl(Topic topic) {
-    subscriberSet = new ArrayList<Subscriber>();
-    numPublishers = 1;
-    this.topic = topic;
-  }
+    public PublisherImpl(Topic topic) {
+        subscriberSet = new ArrayList<Subscriber>();
+        numPublishers = 1;
+        this.topic = topic;
+    }
 
-  @Override
-  public void incPublishers() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
+    @Override
+    public void incPublishers() {
+        numPublishers++;
+    }
 
-  @Override
-  public int decPublishers() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
+    @Override
+    public int decPublishers() {
+        if (numPublishers > 1) {
+            numPublishers--;
+        } 
+        return numPublishers;
+    }
 
-  @Override
-  public void attachSubscriber(Subscriber subscriber) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
+    @Override
+    public void attachSubscriber(Subscriber subscriber) {
+        subscriberSet.add(subscriber);
+    }
 
-  @Override
-  public boolean detachSubscriber(Subscriber subscriber) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
+    @Override
+    public boolean detachSubscriber(Subscriber subscriber) {
+        return subscriberSet.remove(subscriber);
+    }
 
-  @Override
-  public void detachAllSubscribers() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
+    @Override
+    public void detachAllSubscribers() {
+        subscriberSet.clear();
+    }
 
-  @Override
-  public void publish(Message message) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
+    @Override
+    public void publish(Message message) {
+        topic = message.topic;
+        Subscriber subscriber;
 
-  
+        for (int i = 0; i < subscriberSet.size(); i++) {
+            subscriber = subscriberSet.get(i);
+            
+            subscriber.onMessage(message);
+        }
+    }
 }

@@ -7,6 +7,9 @@ import java.util.List;
 import publisher.Publisher;
 import subscriber.Subscriber;
 
+/**
+ * @Author: BLANCO CAAMANO, Ramon <ramonblancocaamano@gmail.com>
+ */
 public interface TopicManager {
 
   Publisher     addPublisherToTopic(Topic topic);
