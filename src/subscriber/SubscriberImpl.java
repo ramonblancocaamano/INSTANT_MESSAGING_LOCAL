@@ -1,5 +1,6 @@
 package subscriber;
 
+import java.util.List;
 import util.Subscription_close;
 import util.Message;
 import util.Topic;
@@ -15,7 +16,7 @@ public class SubscriberImpl implements Subscriber {
     private JTextArea messages_TextArea;
     private JTextArea my_subscriptions_TextArea;
     private Map<Topic, Subscriber> my_subscriptions;
-
+    
     public SubscriberImpl(SwingClient clientSwing) {
         this.messages_TextArea = clientSwing.messages_TextArea;
         this.my_subscriptions_TextArea = clientSwing.my_subscriptions_TextArea;

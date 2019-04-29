@@ -4,16 +4,20 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/topicmanager/TopicManagerImpl.java</file>
-            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/topicmanager/TopicManager.java</file>
             <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/util/Topic.java</file>
             <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/publisher/PublisherImpl.java</file>
             <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/main/The_system.java</file>
-            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/publisher/Publisher.java</file>
             <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/main/SwingClient.java</file>
-            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/util/Message.java</file>
             <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/subscriber/Subscriber.java</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/util/Subscription_check.java</file>
             <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/subscriber/SubscriberImpl.java</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/topicmanager/TopicManagerImpl.java</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/nbproject/build-impl.xml</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/topicmanager/TopicManager.java</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/publisher/Publisher.java</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/util/Subscription_close.java</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/util/Message.java</file>
+            <file>file:/C:/Users/ramon/Documents/NetBeansProjects/INSTANT_MESSAGING_LOCAL/src/util/Topic_check.java</file>
         </group>
     </open-files>
 </project-private>

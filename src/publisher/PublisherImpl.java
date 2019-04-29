@@ -29,36 +29,41 @@ public class PublisherImpl implements Publisher {
 
     @Override
     public int decPublishers() {
-        if (numPublishers > 1) {
-            numPublishers--;
-        } 
+        numPublishers--;
         return numPublishers;
     }
 
     @Override
-    public void attachSubscriber(Subscriber subscriber) {
+    public void attachSubscriber(Subscriber subscriber) {      
         subscriberSet.add(subscriber);
     }
 
     @Override
-    public boolean detachSubscriber(Subscriber subscriber) {
+    public boolean detachSubscriber(Subscriber subscriber) {        
+        Subscription_close close;
+        
+        close = new Subscription_close(topic, Subscription_close.Cause.SUBSCRIBER);
+        subscriber.onClose(close);
         return subscriberSet.remove(subscriber);
     }
 
     @Override
     public void detachAllSubscribers() {
+        Subscription_close close;
+
+        close = new Subscription_close(topic, Subscription_close.Cause.PUBLISHER);
+        for (int i = 0; i < subscriberSet.size(); i++) {
+            subscriberSet.get(i).onClose(close);
+        }
         subscriberSet.clear();
     }
 
     @Override
     public void publish(Message message) {
         topic = message.topic;
-        Subscriber subscriber;
 
         for (int i = 0; i < subscriberSet.size(); i++) {
-            subscriber = subscriberSet.get(i);
-            
-            subscriber.onMessage(message);
+            subscriberSet.get(i).onMessage(message);
         }
     }
 }

@@ -14,6 +14,7 @@ import java.util.Map;
 import publisher.Publisher;
 import subscriber.Subscriber;
 import topicmanager.TopicManager;
+import util.Subscription_close;
 
 /**
  * @Author: BLANCO CAAMANO, Ramon <ramonblancocaamano@gmail.com>
@@ -21,10 +22,10 @@ import topicmanager.TopicManager;
 public class SwingClient {
 
     TopicManager topicManager;
+    SubscriberImpl suscriber;
     public Map<Topic, Subscriber> my_subscriptions;
     Publisher publisher;
     Topic publisherTopic;
-    SubscriberImpl suscriber;
 
     JFrame frame;
     JTextArea topic_list_TextArea;
@@ -38,7 +39,7 @@ public class SwingClient {
         my_subscriptions = new HashMap<Topic, Subscriber>();
         publisher = null;
         publisherTopic = null;
-        suscriber = new SubscriberImpl(this);
+
     }
 
     public void createAndShowGUI() {
@@ -64,7 +65,8 @@ public class SwingClient {
         new_publisher_button.addActionListener(new newPublisherHandler());
         new_subscriber_button.addActionListener(new newSubscriberHandler());
         to_unsubscribe_button.addActionListener(new UnsubscribeHandler());
-        to_post_an_event_button.addActionListener(new postEventHandler());
+        to_post_an_event_button.addActionListener(new postEventHandler());;
+
         to_close_the_app.addActionListener(new CloseAppHandler());
 
         JPanel buttonsPannel = new JPanel(new FlowLayout());
@@ -105,38 +107,94 @@ public class SwingClient {
 
         frame.pack();
         frame.setVisible(true);
+
+        suscriber = new SubscriberImpl(this);
     }
 
     class showTopicsHandler implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            List<Topic> topics;
-            String text = "";
+        public void actionPerformed(ActionEvent e) {            
+            showSubscribersHandler showSubscribers = new showSubscribersHandler();
+            List<Topic> listTopics;
             
-            topics = topicManager.topics();           
-            for (int i = 0; i < topics.size(); i++) {
-                text = text + topics.get(i).name +'\n';
+            listTopics = topicManager.topics();
+            
+            topic_list_TextArea.setText("");
+            for (Topic topic : listTopics) {
+                topic_list_TextArea.append(topic.name + "\n");
             }
             
-            topic_list_TextArea.setText(text);
+            showSubscribers.actionPerformed(e);
+        }
+    }
+
+    class showSubscribersHandler implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            List<Topic> subscriptions;
+            List<Topic> listTopics;
+            boolean hasTopic;
+
+            subscriptions = new ArrayList<Topic>(my_subscriptions.keySet());
+            listTopics = topicManager.topics();
+
+            if (subscriptions.isEmpty()) {
+                return;
+            }
+
+            for (int i = 0; i < my_subscriptions.size(); i++) {
+                subscriptions = new ArrayList<Topic>(my_subscriptions.keySet());
+                hasTopic = listTopics.contains(subscriptions.get(i));
+                if (!hasTopic) {
+                    my_subscriptions.remove(subscriptions.get(i));
+                    i = -1;
+                }
+            }
+
+            subscriptions = new ArrayList<Topic>(my_subscriptions.keySet());
+            my_subscriptions_TextArea.setText("");
+            for (Topic topic : subscriptions) {
+                my_subscriptions_TextArea.append(topic.name + "\n");
+            }
+        }
+    }
+
+    class showPublishersHandler implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            publisher_TextArea.setText(publisherTopic.name);
         }
     }
 
     class newPublisherHandler implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {   
+        public void actionPerformed(ActionEvent e) {
+            showTopicsHandler showTopics = new showTopicsHandler();
+            showPublishersHandler showPublishers = new showPublishersHandler();
             String text;
-            
+            Topic topic;
+
             text = argument_TextField.getText();
             if (text.equals("")) {
+                showTopics.actionPerformed(e);
                 return;
             }
-            
-            publisherTopic = new Topic(text);
-            publisher = topicManager.addPublisherToTopic(publisherTopic);            
-            publisher_TextArea.setText(publisherTopic.name);            
+            topic = new Topic(text);
+
+            if (publisherTopic == null) {
+                publisher = topicManager.addPublisherToTopic(topic);
+            } else if (!publisherTopic.name.equals(topic.name)) {
+                topicManager.removePublisherFromTopic(publisherTopic);
+                publisher = topicManager.addPublisherToTopic(topic);
+            }
+            publisherTopic = topic;
+
+            showTopics.actionPerformed(e);
+            showPublishers.actionPerformed(e);
         }
     }
 
@@ -144,26 +202,24 @@ public class SwingClient {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            List<Topic> topics;
+            showTopicsHandler showTopics = new showTopicsHandler();
             Subscription_check check;
             String text;
             Topic topic;
-            
-            
+            boolean hasTopic;
+
             text = argument_TextField.getText();
             topic = new Topic(text);
-            check = topicManager.subscribe(topic, suscriber);
-            
-            if (check.result == Subscription_check.Result.OKAY) {
-                my_subscriptions.put(topic,suscriber);
+
+            hasTopic = my_subscriptions.containsKey(topic);
+            if (hasTopic == false) {
+                check = topicManager.subscribe(topic, suscriber);
+                if (check.result == Subscription_check.Result.OKAY) {
+                    my_subscriptions.put(topic, suscriber);
+                }
             }
-            
-            text = "";
-            topics =  new ArrayList<Topic>(my_subscriptions.keySet());       
-            for (int i = 0; i < topics.size(); i++) {
-                text = text + topics.get(i).name +'\n';
-            }
-            my_subscriptions_TextArea.setText(text);
+
+            showTopics.actionPerformed(e);
         }
     }
 
@@ -171,24 +227,24 @@ public class SwingClient {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            List<Topic> topics;
+            showTopicsHandler showTopics = new showTopicsHandler();
             Subscription_check check;
             String text;
             Topic topic;
+            boolean hasTopic;
             
             text = argument_TextField.getText();
             topic = new Topic(text);
-            check = topicManager.unsubscribe(topic, suscriber);
-            if (check.result == Subscription_check.Result.OKAY) {
-                my_subscriptions.remove(topic,suscriber);
+
+            hasTopic = my_subscriptions.containsKey(topic);
+            if (hasTopic == true) {
+                check = topicManager.unsubscribe(topic, suscriber);
+                if (check.result == Subscription_check.Result.NO_SUBSCRIPTION) {
+                    my_subscriptions.remove(topic, suscriber);
+                }
             }
-            
-            text = "";
-            topics =  new ArrayList<Topic>(my_subscriptions.keySet());       
-            for (int i = 0; i < topics.size(); i++) {
-                text = text + topics.get(i).name +'\n';
-            }
-            my_subscriptions_TextArea.setText(text);
+
+            showTopics.actionPerformed(e);
         }
     }
 
@@ -196,13 +252,15 @@ public class SwingClient {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            List<Topic> topics;
+            showTopicsHandler showTopics = new showTopicsHandler();
             String text;
             Message message;
-            
+
             text = argument_TextField.getText();
             message = new Message(publisherTopic, text);
             publisher.publish(message);
+            
+            showTopics.actionPerformed(e);
         }
     }
 

@@ -24,15 +24,37 @@ public class TopicManagerImpl implements TopicManager {
 
     @Override
     public Publisher addPublisherToTopic(Topic topic) {
-        Publisher publisher = new PublisherImpl(topic);
-        topicMap.put(topic, publisher);        
+        Topic_check check;
+        Publisher publisher;
+        
+        check = isTopic(topic);
+        if (check.isOpen == false) {
+            publisher = new PublisherImpl(topic);
+            topicMap.put(topic, publisher);
+            return publisher;
+        } 
+        publisher = topicMap.get(topic);
+        publisher.incPublishers();
         return publisher;
     }
 
     @Override
     public void removePublisherFromTopic(Topic topic) {
-        Publisher publisher = new PublisherImpl(topic);
-        topicMap.remove(topic, publisher);
+        Topic_check check;
+        Publisher publisher;
+        int num;
+        
+        check = isTopic(topic);
+        if (check.isOpen == false ){
+            return;
+        }
+        publisher = topicMap.get(topic);
+        num = publisher.decPublishers();
+        
+        if (num == 0) {            
+            publisher.detachAllSubscribers();
+            topicMap.remove(topic, publisher);
+        }
     }
 
     @Override
@@ -55,42 +77,35 @@ public class TopicManagerImpl implements TopicManager {
     public Subscription_check subscribe(Topic topic, Subscriber subscriber) {
         Subscription_check check;
         Publisher publisher;
-        
-        if(topicMap.containsKey(topic) == false ) {
-           check = new Subscription_check(topic, Subscription_check.Result.NO_TOPIC);
-           return check;
-        }
-      
-       publisher = topicMap.get(topic);
-        if( publisher == null) {
-            check = new Subscription_check(topic, Subscription_check.Result.NO_SUBSCRIPTION);
+        boolean hasTopic;
+
+        hasTopic = topicMap.containsKey(topic);
+        if (hasTopic == false) {
+            check = new Subscription_check(topic, Subscription_check.Result.NO_TOPIC);
             return check;
         }
-        
+
+        publisher = topicMap.get(topic);
         publisher.attachSubscriber(subscriber);
         check = new Subscription_check(topic, Subscription_check.Result.OKAY);
         return check;
-
     }
 
     @Override
     public Subscription_check unsubscribe(Topic topic, Subscriber subscriber) {
         Publisher publisher;
-        Subscription_check check;        
+        Subscription_check check;
+        boolean hasTopic;
 
-        if (topicMap.containsKey(topic) == false) {
+        hasTopic = topicMap.containsKey(topic);
+        if (hasTopic == false) {
             check = new Subscription_check(topic, Subscription_check.Result.NO_TOPIC);
             return check;
         }
         
         publisher = topicMap.get(topic);
-        if( publisher == null) {
-            check = new Subscription_check(topic, Subscription_check.Result.NO_SUBSCRIPTION);
-            return check;
-        }
-        
         publisher.detachSubscriber(subscriber);
-        check = new Subscription_check(topic, Subscription_check.Result.OKAY);
+        check = new Subscription_check(topic, Subscription_check.Result.NO_SUBSCRIPTION);
         return check;
     }
 }
