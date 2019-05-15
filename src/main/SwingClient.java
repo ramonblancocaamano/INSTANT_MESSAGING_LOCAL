@@ -1,20 +1,19 @@
 package main;
 
-import java.util.List;
 import util.Message;
 import util.Subscription_check;
 import util.Topic;
 import subscriber.SubscriberImpl;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import publisher.Publisher;
 import subscriber.Subscriber;
 import topicmanager.TopicManager;
-import util.Subscription_close;
 
 /**
  * @Author: BLANCO CAAMANO, Ramon <ramonblancocaamano@gmail.com>
@@ -23,12 +22,13 @@ public class SwingClient {
 
     TopicManager topicManager;
     SubscriberImpl suscriber;
+    public List<Topic> listTopics;
     public Map<Topic, Subscriber> my_subscriptions;
     Publisher publisher;
     Topic publisherTopic;
 
     JFrame frame;
-    JTextArea topic_list_TextArea;
+    public JTextArea topic_list_TextArea;
     public JTextArea messages_TextArea;
     public JTextArea my_subscriptions_TextArea;
     JTextArea publisher_TextArea;
@@ -36,6 +36,7 @@ public class SwingClient {
 
     public SwingClient(TopicManager topicManager) {
         this.topicManager = topicManager;
+        listTopics = new ArrayList<Topic>();
         my_subscriptions = new HashMap<Topic, Subscriber>();
         publisher = null;
         publisherTopic = null;
@@ -116,9 +117,9 @@ public class SwingClient {
         @Override
         public void actionPerformed(ActionEvent e) {            
             showSubscribersHandler showSubscribers = new showSubscribersHandler();
-            List<Topic> listTopics;
             
-            listTopics = topicManager.topics();
+            listTopics.clear();
+            listTopics.addAll(topicManager.topics());
             
             topic_list_TextArea.setText("");
             for (Topic topic : listTopics) {
@@ -134,13 +135,13 @@ public class SwingClient {
         @Override
         public void actionPerformed(ActionEvent e) {
             List<Topic> subscriptions;
-            List<Topic> listTopics;
+            Subscription_check check;
             boolean hasTopic;
 
             subscriptions = new ArrayList<Topic>(my_subscriptions.keySet());
-            listTopics = topicManager.topics();
 
             if (subscriptions.isEmpty()) {
+                my_subscriptions_TextArea.setText("");
                 return;
             }
 
@@ -148,8 +149,11 @@ public class SwingClient {
                 subscriptions = new ArrayList<Topic>(my_subscriptions.keySet());
                 hasTopic = listTopics.contains(subscriptions.get(i));
                 if (!hasTopic) {
-                    my_subscriptions.remove(subscriptions.get(i));
-                    i = -1;
+                    check = topicManager.unsubscribe(subscriptions.get(i), my_subscriptions.get(subscriptions.get(i)));
+                    if (check.result == Subscription_check.Result.NO_SUBSCRIPTION) {
+                        my_subscriptions.remove(subscriptions.get(i), my_subscriptions.get(subscriptions.get(i)));
+                        i = -1;
+                    }
                 }
             }
 
@@ -301,8 +305,6 @@ public class SwingClient {
 
         @Override
         public void windowClosing(WindowEvent e) {
-
-            //...
             System.out.println("one user closed");
         }
     }
